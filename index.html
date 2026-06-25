@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TFC — Вайрфреймы сайта</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f4f0;
+    --bg3: #eeecea;
+    --text: #1a1a18;
+    --text2: #6b6b66;
+    --text3: #a0a09a;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --radius: 8px;
+    --radius-lg: 12px;
+    --info-bg: #e6f1fb;
+    --info-text: #0c447c;
+    --info-border: #b5d4f4;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
+
+  /* TOP NAV */
+  .top-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); border-bottom: 0.5px solid var(--border2); padding: 0 24px; display: flex; align-items: center; gap: 0; height: 48px; box-shadow: 0 1px 8px rgba(0,0,0,0.06); }
+  .top-nav-logo { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: 0.06em; margin-right: 24px; white-space: nowrap; }
+  .top-nav-logo span { color: var(--text3); font-weight: 400; }
+  .top-nav-tabs { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; flex: 1; }
+  .top-nav-tabs::-webkit-scrollbar { display: none; }
+  .tab-btn { padding: 0 16px; height: 48px; font-size: 12px; font-weight: 500; color: var(--text3); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+  .top-nav-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; padding-left: 16px; }
+  .print-btn { font-size: 12px; padding: 5px 14px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text2); cursor: pointer; }
+  .print-btn:hover { background: var(--bg2); }
+
+  /* PAGES */
+  .pages-wrap { padding: 32px 24px; }
+  .page-section { display: none; }
+  .page-section.active { display: block; }
+
+  /* PAGE HEADER */
+  .page-header { max-width: 680px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: space-between; }
+  .page-header-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .page-header-sub { font-size: 11px; color: var(--text3); }
+
+  /* WIREFRAME CONTAINER */
+  .wf { max-width: 680px; margin: 0 auto; border: 0.5px solid var(--border2); border-radius: var(--radius-lg); overflow: hidden; background: var(--bg); }
+  .wf-nav { background: var(--bg); border-bottom: 0.5px solid var(--border); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .wf-logo { font-size: 14px; font-weight: 500; color: var(--text); }
+  .wf-nav-links { display: flex; gap: 16px; }
+  .wf-nav-links a { font-size: 12px; color: var(--text2); text-decoration: none; }
+  .wf-nav-cta { font-size: 12px; font-weight: 500; color: var(--text); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 5px 12px; white-space: nowrap; }
+  .divider-label { font-size: 10px; color: var(--text3); letter-spacing: 0.08em; text-align: center; padding: 8px 0; background: var(--bg2); border-bottom: 0.5px solid var(--border); }
+  .section { padding: 28px 24px; border-bottom: 0.5px solid var(--border); }
+  .section:last-child { border-bottom: none; }
+  .section-label { font-size: 10px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .section-title { font-size: 18px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .section-sub { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 20px; }
+  .btn-primary { background: var(--text); color: var(--bg); border: none; border-radius: var(--radius); padding: 9px 20px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .btn-secondary { background: transparent; color: var(--text); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 9px 20px; font-size: 13px; cursor: pointer; }
+  .hero { background: var(--bg2); padding: 40px 24px 32px; border-bottom: 0.5px solid var(--border); }
+  .hero-breadcrumb { font-size: 11px; color: var(--text3); margin-bottom: 12px; }
+  .hero-eyebrow { font-size: 11px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+  .hero-h { font-size: 22px; font-weight: 500; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
+  .hero-sub { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 20px; max-width: 420px; }
+  .hero-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .hero-video { margin-top: 20px; background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); height: 120px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .play-btn { width: 38px; height: 38px; border-radius: 50%; border: 0.5px solid var(--border2); display: flex; align-items: center; justify-content: center; color: var(--text2); font-size: 16px; }
+  .video-label { font-size: 13px; color: var(--text2); }
+  .video-sub { font-size: 11px; color: var(--text3); }
+  .channels { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .channel { font-size: 12px; color: var(--text2); background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 5px 12px; }
+  .tools-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .tool-chip { font-size: 11px; color: var(--text2); background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 5px 10px; }
+  .clients { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .client-logo { height: 18px; width: 64px; background: var(--border); border-radius: 3px; opacity: 0.45; }
+  .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .service-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
+  .service-icon { width: 30px; height: 30px; border-radius: var(--radius); background: var(--bg2); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text2); margin-bottom: 10px; }
+  .service-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .service-desc { font-size: 12px; color: var(--text2); line-height: 1.5; margin-bottom: 10px; }
+  .service-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+  .tag { font-size: 10px; color: var(--text2); background: var(--bg2); border: 0.5px solid var(--border); border-radius: 4px; padding: 2px 7px; }
+  .service-link { font-size: 12px; color: var(--text2); }
+  .cases-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .case-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .case-img { height: 80px; background: var(--bg2); display: flex; align-items: center; justify-content: center; position: relative; }
+  .case-img-lbl { font-size: 11px; color: var(--text3); }
+  .case-type-badge { position: absolute; top: 8px; left: 8px; font-size: 10px; background: var(--bg); border: 0.5px solid var(--border); border-radius: 4px; padding: 2px 6px; color: var(--text2); }
+  .case-body { padding: 10px 12px; }
+  .case-client { font-size: 11px; color: var(--text3); margin-bottom: 2px; }
+  .case-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 5px; }
+  .case-result { font-size: 11px; color: var(--text2); margin-bottom: 2px; }
+  .case-result span { font-weight: 500; color: var(--text); }
+  .case-link { font-size: 11px; color: var(--text2); margin-top: 6px; display: block; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+  .stat { background: var(--bg2); border-radius: var(--radius); padding: 14px; text-align: center; }
+  .stat-num { font-size: 22px; font-weight: 500; color: var(--text); }
+  .stat-label { font-size: 11px; color: var(--text2); margin-top: 3px; line-height: 1.4; }
+  .awards { display: flex; gap: 10px; margin-top: 14px; }
+  .award { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 14px; flex: 1; display: flex; align-items: center; gap: 10px; }
+  .award-badge { font-size: 18px; min-width: 28px; text-align: center; }
+  .award-text { font-size: 11px; color: var(--text2); line-height: 1.4; }
+  .process-steps { display: flex; flex-direction: column; }
+  .step { display: flex; gap: 14px; padding: 13px 0; border-bottom: 0.5px solid var(--border); }
+  .step:last-child { border-bottom: none; }
+  .step-num { font-size: 13px; font-weight: 500; color: var(--text3); min-width: 24px; padding-top: 1px; }
+  .step-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .step-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .step-duration { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .reviews { display: flex; flex-direction: column; gap: 10px; }
+  .review { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+  .review-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg2); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: var(--text2); flex-shrink: 0; }
+  .review-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .review-role { font-size: 11px; color: var(--text3); }
+  .review-text { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .cta-block { background: var(--bg2); padding: 32px 24px; text-align: center; }
+  .cta-title { font-size: 18px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .cta-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+  .form { display: flex; flex-direction: column; gap: 8px; max-width: 320px; margin: 0 auto; }
+  .form input, .form textarea, .form select { padding: 9px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius); font-size: 13px; color: var(--text2); background: var(--bg); width: 100%; font-family: inherit; }
+  .form textarea { height: 68px; resize: none; }
+  .form-note { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .footer { background: var(--bg); padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; border-top: 0.5px solid var(--border); }
+  .footer-col-title { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
+  .footer-link { display: block; font-size: 11px; color: var(--text2); margin-bottom: 5px; text-decoration: none; }
+  .footer-bottom { background: var(--bg2); padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid var(--border); }
+  .footer-copy { font-size: 11px; color: var(--text3); }
+  .footer-social { display: flex; gap: 12px; font-size: 11px; color: var(--text3); }
+  .included-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+  .included-item:last-child { border-bottom: none; }
+  .included-icon { width: 32px; height: 32px; border-radius: var(--radius); background: var(--bg2); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--text2); flex-shrink: 0; }
+  .included-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .included-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .packages { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .pkg { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
+  .pkg.featured { border: 2px solid var(--info-border); }
+  .pkg-badge { font-size: 10px; background: var(--info-bg); color: var(--info-text); border-radius: 4px; padding: 2px 8px; display: inline-block; margin-bottom: 8px; }
+  .pkg-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .pkg-price { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .pkg-price span { font-size: 11px; font-weight: 400; color: var(--text3); }
+  .pkg-features { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .pkg-features li { font-size: 11px; color: var(--text2); display: flex; align-items: center; gap: 5px; }
+  .faq-item { padding: 13px 0; border-bottom: 0.5px solid var(--border); }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 5px; }
+  .faq-a { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .deliverables { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .deliv { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px; }
+  .deliv-icon { font-size: 18px; color: var(--text2); margin-bottom: 8px; }
+  .deliv-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .deliv-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .types-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .type-card { background: var(--bg2); border-radius: var(--radius); padding: 14px; }
+  .type-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .type-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .formats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .format-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px; }
+  .format-icon { font-size: 18px; color: var(--text2); margin-bottom: 8px; }
+  .format-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .format-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .reel-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .reel-thumb { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius); height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .reel-play { font-size: 18px; color: var(--text3); }
+  .reel-label { font-size: 10px; color: var(--text3); text-align: center; padding: 0 6px; }
+  .filter-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .filter-label { font-size: 11px; color: var(--text3); min-width: 56px; }
+  .filter-chip { font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 0.5px solid var(--border); background: var(--bg); color: var(--text2); }
+  .filter-chip.active { background: var(--text); color: var(--bg); border-color: transparent; }
+  .search-input { width: 100%; padding: 8px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius); font-size: 13px; color: var(--text2); background: var(--bg); font-family: inherit; }
+  .load-more { padding: 20px 24px; text-align: center; border-bottom: 0.5px solid var(--border); }
+  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+  .svc-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 0.5px solid var(--border); }
+  .svc-item:last-child { border-bottom: none; }
+  .svc-icon { width: 36px; height: 36px; border-radius: var(--radius); background: var(--bg2); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 17px; color: var(--text2); flex-shrink: 0; }
+  .svc-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .svc-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .showreel { margin-top: 20px; background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); height: 110px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .showreel-label { font-size: 13px; color: var(--text2); }
+  .showreel-sub { font-size: 11px; color: var(--text3); }
+  .wf-nav-dropdown { position: relative; }
+  .wf-nav-dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--radius); box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-width: 140px; z-index: 50; padding: 4px 0; }
+  .wf-nav-dropdown:hover .wf-nav-dropdown-menu { display: block; }
+  .wf-nav-dropdown-menu a { display: block; padding: 7px 14px; font-size: 12px; color: var(--text2); text-decoration: none; }
+  .wf-nav-dropdown-menu a:hover { background: var(--bg2); color: var(--text); }
+  .interact-badge { display: inline-block; margin-left: 8px; font-size: 9px; font-weight: 600; letter-spacing: 0.06em; background: #fff8e1; color: #b45309; border: 0.5px solid #fcd34d; border-radius: 4px; padding: 1px 6px; vertical-align: middle; }
+
+  @media print {
+    .top-nav { display: none; }
+    .pages-wrap { padding: 0; }
+    .page-section { display: block !important; page-break-after: always; }
+    .page-header { padding: 20px 0 10px; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="top-nav-logo">TFC <span>/ Вайрфреймы</span></div>
+  <div class="top-nav-tabs">
+    <button class="tab-btn active" onclick="showPage('home', this)">Главная</button>
+    <button class="tab-btn" onclick="showPage('smm', this)">SMM</button>
+    <button class="tab-btn" onclick="showPage('marketing', this)">Marketing</button>
+    <button class="tab-btn" onclick="showPage('branding', this)">Branding</button>
+    <button class="tab-btn" onclick="showPage('production', this)">Production</button>
+    <button class="tab-btn" onclick="showPage('portfolio', this)">Кейсы</button>
+    <button class="tab-btn" onclick="showPage('about', this)">О нас</button>
+    <button class="tab-btn" onclick="showPage('blog', this)">Блог</button>
+    <button class="tab-btn" onclick="showPage('case', this)">Кейс (пример)</button>
+  </div>
+  <div class="top-nav-actions">
+    <button class="print-btn" onclick="window.print()">Печать / PDF</button>
+  </div>
+</nav>
+
+<div class="pages-wrap">
+
+  <!-- ==================== ГЛАВНАЯ ==================== -->
+  <div class="page-section active" id="page-home">
+    <div class="page-header"><div><div class="page-header-title">Главная страница</div><div class="page-header-sub">9 блоков · Детальный вайрфрейм</div></div></div>
+    <div class="wf">
+      <div class="wf-nav">
+        <div class="wf-logo">Future</div>
+        <div class="wf-nav-links"><div class="wf-nav-dropdown"><a href="#" style="cursor:pointer">Услуги ▾</a><div class="wf-nav-dropdown-menu"><a href="#" onclick="goToPage('smm');return false;">SMM</a><a href="#" onclick="goToPage('marketing');return false;">Marketing</a><a href="#" onclick="goToPage('branding');return false;">Branding</a><a href="#" onclick="goToPage('production');return false;">Production</a></div></div><a href="#" onclick="goToPage('portfolio');return false;">Кейсы</a><a href="#" onclick="goToPage('about');return false;">О нас</a><a href="#" onclick="goToPage('blog');return false;">Блог</a></div>
+        <div class="wf-nav-cta">Оставить заявку</div>
+      </div>
+      <div class="divider-label">① HERO <span class="interact-badge">фоновые 3D объекты движутся при скролле · видео открывается на странице без перехода</span></div>
+      <div class="hero">
+        <div class="hero-eyebrow">Рекламное агентство · Алматы · с 2018</div>
+        <div class="hero-h">Бренды сильны не охватами, а связью с людьми. Мы эту связь находим.</div>
+        <div class="hero-sub">150+ проектов, где мы не просто отдали проект, а помогли бизнесу достичь показателей, необходимых для развития</div>
+        <div class="hero-btns"><button class="btn-primary">Обсудить проект</button><button class="btn-secondary" onclick="goToPage('portfolio')">Смотреть кейсы</button></div>
+        <div class="hero-video"><div class="play-btn">▶</div><div><div class="video-label">Showreel 2024</div><div class="video-sub">2 мин · лучшие работы</div></div></div>
+      </div>
+      <div class="divider-label">② CLIENTS <span class="interact-badge">логотипы клиентов бегут по строке бесконечно</span></div>
+      <div class="section"><div class="section-label">Нам доверяют</div><div class="section-sub" style="font-size:12px;color:var(--text2);margin-bottom:12px">За каждым логотипом — совместная работа, десятки встреч, сотни идей и одна общая цель: сделать бренд сильнее.</div><div class="clients"><div class="client-logo" title="Carlsberg"></div><div class="client-logo" title="Jaguar & LR"></div><div class="client-logo" title="Cadillac"></div><div class="client-logo" title="Bereke Bank"></div><div class="client-logo" title="TedX"></div><div class="client-logo" title="KIF"></div><div class="client-logo" title="TESS"></div><div class="client-logo" title="KFC"></div><div class="client-logo" title="Turkish Airlines"></div><div class="client-logo" title="Яндекс"></div><div class="client-logo" title="ВТБ"></div><div class="client-logo" title="Tytan"></div><div class="client-logo" title="Fawori"></div><div class="client-logo" title="Sika"></div><div class="client-logo" title="Pepero"></div><div class="client-logo" title="PariMatch"></div></div></div>
+      <div class="divider-label">③ ABOUT <span class="interact-badge">фотографии листаются в карусели</span></div>
+      <div class="section">
+        <div class="section-label">Команда</div>
+        <div class="section-title" style="font-size:16px;max-width:360px;line-height:1.4">За каждым проектом стоят люди, которые его создают</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px">
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);height:100px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3)">Tagline 2023</div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);height:100px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3)">Команда</div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);height:100px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3)">Команда</div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);height:100px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3)">Офис</div>
+        </div>
+        <div style="margin-top:16px;font-size:12px;color:var(--text2);line-height:1.6">Мы объединяем стратегию, креатив, маркетинг и продакшн, чтобы находить то, что помогает вам</div>
+        <div style="margin-top:12px;font-size:15px;font-weight:500;color:var(--text);line-height:1.5">To be, to do, to create<br><span style="border-bottom:2px solid #b8f000">Together. To Future</span></div>
+      </div>
+      <div class="divider-label">④ STATS</div>
+      <div class="section">
+        <div class="section-title">Оставить след в истории</div>
+        <div class="stats-grid">
+          <div class="stat"><div class="stat-num">8</div><div class="stat-label">лет на рынке</div></div>
+          <div class="stat"><div class="stat-num">4</div><div class="stat-label">страны присутствия</div></div>
+          <div class="stat"><div class="stat-num">5</div><div class="stat-label">офисов</div></div>
+          <div class="stat"><div class="stat-num">150+</div><div class="stat-label">реализованных проектов</div></div>
+          <div class="stat"><div class="stat-num">45</div><div class="stat-label">специалистов в команде</div></div>
+          <div class="stat"><div class="stat-num">50+</div><div class="stat-label">наград на фестивалях</div></div>
+        </div>
+        <div class="awards" style="flex-direction:column;gap:6px">
+          <div class="award"><div class="award-badge">🏆</div><div class="award-text">Победители Tagline Awards 2023-2024</div></div>
+          <div class="award"><div class="award-badge">🥇</div><div class="award-text">Команда агентства победители Young Lions в категории Film</div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑤ WHY US</div>
+      <div class="section">
+        <div class="section-title">Мы из будущего и уже знаем, что вы выбрали нас</div>
+        <div class="section-sub">8 лет практики. Работали с FMCG, строительством, финансами, медициной, авто.</div>
+        <div class="process-steps">
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">Прозрачные KPI</div><div class="step-desc">Утверждаем до старта. Отчёты регулярно, цифрами, без воды.</div></div></div>
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">Изучаем бизнес-задачу</div><div class="step-desc">Рынок, аудитория, контекст — чтобы решение работало в реальности, а не на слайдах.</div></div></div>
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">Inhouse-команда</div><div class="step-desc">Маркетинг, SMM, продакшн, дизайн, AI — без подрядчиков. Отвечаем за сроки и качество сами.</div></div></div>
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">Продакшн в любой точке</div><div class="step-desc">Собираем команду под задачу в Казахстане, Евросоюзе и Узбекистане.</div></div></div>
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">Технологии по делу</div><div class="step-desc">AI и digital-инструменты — там, где они реально помогают.</div></div></div>
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">Предлагаем больше, чем в брифе</div><div class="step-desc">Видим возможность добавить канал или инструмент — говорим. Даже если не просили.</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑥ CASES</div>
+      <div class="section">
+        <div class="section-label">Избранные работы</div>
+        <div class="section-title">Наши работы, за каждой из которых стоит история</div>
+        <div class="cases-grid">
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">Carlsberg Kazakhstan</div><div class="case-result">Корпоративный фильм</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">Pepero</div><div class="case-result">SMM — запуск в Казахстане</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">Cadillac</div><div class="case-result">SMM — премиальный бренд</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">MG Cars</div><div class="case-result">SMM-продвижение</div></div></div>
+        </div>
+        <div style="text-align:center;margin-top:14px"><button class="btn-secondary" onclick="goToPage('portfolio')">Смотреть все кейсы →</button></div>
+      </div>
+      <div class="divider-label">⑦ PROCESS</div>
+      <div class="section">
+        <div class="section-label">От идеи до реализации</div>
+        <div class="section-title">Мы делаем работу так, чтобы вы возвращались снова</div>
+        <div class="process-steps">
+          <div class="step"><div class="step-num">01</div><div><div class="step-title">Изучаем бизнес</div><div class="step-desc">Задаём много вопросов и пытаемся разобраться, что действительно поможет расти.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div><div class="step-title">Формируем решение</div><div class="step-desc">Определяем стратегию, целевую аудиторию и инструменты для достижения цели.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div><div class="step-title">Реализуем</div><div class="step-desc">Запускаем проект и смотрим на него в действии, корректируя и внедряя новые практики.</div></div></div>
+          <div class="step"><div class="step-num">04</div><div><div class="step-title">Масштабируем результат</div><div class="step-desc">Любой результат можно сделать ещё лучше.</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑧ REVIEWS</div>
+      <div class="section">
+        <div class="section-label">Отзывы клиентов</div>
+        <div class="reviews">
+          <div class="review"><div class="review-top"><div class="avatar">ИИ</div><div><div class="review-name">Ибрагимов Ильяс</div><div class="review-role">Директор управления маркетинга · Сбербанк Казахстан</div></div></div><div class="review-text">Агентство заслужило авторитет организации, которой можно доверять решение самых сложных вопросов.</div></div>
+          <div class="review"><div class="review-top"><div class="avatar">ДК</div><div><div class="review-name">Данияр Косназаров</div><div class="review-role">PR-директор · KPMG</div></div></div><div class="review-text">Быстрое реагирование, понимание специфики компании. Брейнштормят с нами и дают свежие идеи.</div></div>
+          <div class="review"><div class="review-top"><div class="avatar">КМ</div><div><div class="review-name">Кожан Молдагалиев</div><div class="review-role">Директор · iTaxi (партнёр Яндекс.Такси)</div></div></div><div class="review-text">Много креатива, быстрое реагирование на запросы, чёткое исполнение обязательств.</div></div>
+          <div class="review"><div class="review-top"><div class="avatar">TW</div><div><div class="review-name">Tom Wilde</div><div class="review-role">Директор · Kazakhstan International School</div></div></div><div class="review-text">From design to implementation, FUTURE team did a fantastic job for us.</div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑨ CTA <span class="interact-badge">кнопка с бегущим текстом · форма раскрывается без перехода</span></div>
+      <div class="cta-block">
+        <div class="cta-title">Оставить след в Future</div>
+        <div class="cta-sub">Спойлер: мы из Future и уже знаем, что создадим для вас!</div>
+        <div class="form"><input type="text" placeholder="Имя"><input type="text" placeholder="Телефон или email"><textarea placeholder="Кратко о проекте и задаче"></textarea><button class="btn-primary">Свяжитесь с нами</button><div class="form-note">Ответим в течение одного рабочего дня</div></div>
+      </div>
+      <div class="footer" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        <div>
+          <div class="footer-col-title">Future Agency</div>
+          <div class="footer-col-title" style="font-size:11px;font-weight:400;color:var(--text3);margin-top:8px">Казахстан, Алматы</div>
+          <a class="footer-link">Тимирязева 15Б</a><a class="footer-link">info@tfc.kz</a><a class="footer-link">+7 776 350 03 33</a>
+          <div class="footer-col-title" style="font-size:11px;font-weight:400;color:var(--text3);margin-top:8px">Болгария, София</div>
+          <a class="footer-link">14 Tsar Osvoboditel Blvd</a>
+          <div class="footer-col-title" style="font-size:11px;font-weight:400;color:var(--text3);margin-top:8px">Узбекистан, Ташкент</div>
+          <a class="footer-link">Rakat ko'chasi 8</a>
+        </div>
+        <div><div class="footer-col-title">Услуги</div><a class="footer-link" href="#" onclick="goToPage('smm');return false;">SMM</a><a class="footer-link" href="#" onclick="goToPage('marketing');return false;">Marketing</a><a class="footer-link" href="#" onclick="goToPage('branding');return false;">Branding</a><a class="footer-link" href="#" onclick="goToPage('production');return false;">Production</a></div>
+        <div><div class="footer-col-title">Компания</div><a class="footer-link" href="#" onclick="goToPage('about');return false;">О нас</a><a class="footer-link" href="#" onclick="goToPage('portfolio');return false;">Кейсы</a><a class="footer-link" href="#" onclick="goToPage('blog');return false;">Блог</a><a class="footer-link">Вакансии</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© Future Agency, 2026</span><div class="footer-social"><span>Instagram</span><span>YouTube</span><span>Telegram</span></div></div>
+    </div>
+  </div>
+
+  <!-- ==================== SMM ==================== -->
+  <div class="page-section" id="page-smm">
+    <div class="page-header"><div><div class="page-header-title">Страница SMM</div><div class="page-header-sub">7 блоков · Детальный вайрфрейм</div></div></div>
+    <div class="wf">
+      <div class="wf-nav"><div class="wf-logo">Future</div><div class="wf-nav-links"><div class="wf-nav-dropdown"><a href="#" style="cursor:pointer">Услуги ▾</a><div class="wf-nav-dropdown-menu"><a href="#" onclick="goToPage('smm');return false;">SMM</a><a href="#" onclick="goToPage('marketing');return false;">Marketing</a><a href="#" onclick="goToPage('branding');return false;">Branding</a><a href="#" onclick="goToPage('production');return false;">Production</a></div></div><a href="#" onclick="goToPage('portfolio');return false;">Кейсы</a><a href="#" onclick="goToPage('about');return false;">О нас</a><a href="#" onclick="goToPage('blog');return false;">Блог</a></div><div class="wf-nav-cta">Оставить заявку</div></div>
+      <div class="divider-label">① HERO <span class="interact-badge">фоновые 3D объекты движутся при скролле · видео открывается на странице без перехода</span></div>
+      <div class="hero">
+        <div class="hero-breadcrumb">Главная / Услуги / SMM</div>
+        <div class="hero-h">Помогаем брендам находить своих людей в социальных сетях</div>
+        <div class="hero-sub">Социальные сети — место, где бренды ежедневно встречаются со своей аудиторией. Мы помогаем выстраивать эту связь через стратегию, контент, продвижение и работу с сообществом.</div>
+        <div class="hero-btns"><button class="btn-primary">Обсудить проект</button><button class="btn-secondary" onclick="goToPage('portfolio')">Наши работы</button></div>
+        <div class="channels"><span class="channel">Instagram</span><span class="channel">Telegram</span><span class="channel">VK</span><span class="channel">TikTok</span><span class="channel">YouTube</span></div>
+      </div>
+      <div class="divider-label">② INCLUDED</div>
+      <div class="section">
+        <div class="section-label">Состав услуги</div>
+        <div class="section-title">Чем мы можем вам помочь</div>
+        <div class="included-item"><div class="included-icon">🎯</div><div><div class="included-title">SMM-стратегия</div><div class="included-desc">Анализ ЦА, конкурентов, платформ. Позиционирование и tone of voice.</div></div></div>
+        <div class="included-item"><div class="included-icon">📋</div><div><div class="included-title">Контент-план и рубрикатор</div><div class="included-desc">Темы, форматы, частота публикаций на месяц вперёд.</div></div></div>
+        <div class="included-item"><div class="included-icon">🖼</div><div><div class="included-title">Производство контента</div><div class="included-desc">Тексты, дизайн, reels, stories. Уникальный визуальный стиль.</div></div></div>
+        <div class="included-item"><div class="included-icon">📣</div><div><div class="included-title">Таргетированная реклама</div><div class="included-desc">Настройка, запуск, оптимизация. Отчёт по каждому объявлению.</div></div></div>
+        <div class="included-item"><div class="included-icon">📈</div><div><div class="included-title">Аналитика и отчётность</div><div class="included-desc">Еженедельные отчёты с метриками, выводами и рекомендациями.</div></div></div>
+      </div>
+      <div class="divider-label">③ PACKAGES</div>
+      <div class="section">
+        <div class="section-label">Стоимость</div>
+        <div class="section-title">Выберите формат работы</div>
+        <div class="section-sub">Все пакеты включают персонального менеджера и еженедельный отчёт</div>
+        <div class="packages">
+          <div class="pkg"><div class="pkg-name">Старт</div><div class="pkg-price">от 150 000 ₸<span> / мес</span></div><ul class="pkg-features"><li>✓ 1 платформа</li><li>✓ 12 постов / мес</li><li>✓ Базовый таргет</li><li>✓ Ежемес. отчёт</li></ul><button class="btn-secondary" style="width:100%;font-size:12px;padding:7px">Выбрать</button></div>
+          <div class="pkg featured"><div class="pkg-badge">Популярный</div><div class="pkg-name">Стандарт</div><div class="pkg-price">от 300 000 ₸<span> / мес</span></div><ul class="pkg-features"><li>✓ 2 платформы</li><li>✓ 20 постов / мес</li><li>✓ Таргет + аналитика</li><li>✓ Еженед. отчёт</li></ul><button class="btn-primary" style="width:100%;font-size:12px;padding:7px">Выбрать</button></div>
+          <div class="pkg"><div class="pkg-name">Про</div><div class="pkg-price">от 550 000 ₸<span> / мес</span></div><ul class="pkg-features"><li>✓ 3+ платформы</li><li>✓ Без лимита постов</li><li>✓ Полный цикл</li><li>✓ Приор. поддержка</li></ul><button class="btn-secondary" style="width:100%;font-size:12px;padding:7px">Выбрать</button></div>
+        </div>
+      </div>
+      <div class="divider-label">④ PROCESS</div>
+      <div class="section">
+        <div class="section-label">Как мы работаем</div>
+        <div class="section-title">Каждый проект начинается с понимания</div>
+        <div class="process-steps">
+          <div class="step"><div class="step-num">01</div><div><div class="step-title">Бриф и аудит</div><div class="step-desc">Заполняете анкету, мы изучаем нишу и конкурентов.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div><div class="step-title">Стратегия</div><div class="step-desc">Готовим платформу бренда, tone of voice, рубрикатор.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div><div class="step-title">Контент-план</div><div class="step-desc">Согласовываем темы и форматы на первый месяц.</div></div></div>
+          <div class="step"><div class="step-num">04</div><div><div class="step-title">Производство и запуск</div><div class="step-desc">Публикуем, запускаем рекламу, мониторим результат.</div></div></div>
+          <div class="step"><div class="step-num">05</div><div><div class="step-title">Отчёт и оптимизация</div><div class="step-desc">Каждую неделю — цифры, выводы, следующие шаги.</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑤ CASES</div>
+      <div class="section">
+        <div class="section-label">Результаты в цифрах</div>
+        <div class="cases-grid">
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">Q Univer</div><div class="case-result">SMM</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">TYTAN</div><div class="case-result">SMM</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">Jaguar & Land Rover</div><div class="case-result">SMM — тихая роскошь</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">Allur</div><div class="case-result">SMM</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑥ TEAM <span class="interact-badge">карточки команды листаются в карусели</span></div>
+      <div class="section">
+        <div class="section-title">Команда, которая будет работать над вашим проектом</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Евгений Никонов</div><div style="font-size:10px;color:var(--text3)">CEO</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Сергей Романов</div><div style="font-size:10px;color:var(--text3)">Тех. директор, AI</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Арина Арсланова</div><div style="font-size:10px;color:var(--text3)">Креативный директор</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Мадина Нусипалиева</div><div style="font-size:10px;color:var(--text3)">PR-менеджер</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Мария Киркум</div><div style="font-size:10px;color:var(--text3)">SMM-менеджер</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">София Саттарова</div><div style="font-size:10px;color:var(--text3)">SMM-менеджер</div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑦ CTA</div>
+      <div class="cta-block">
+        <div class="cta-title">Есть задача для SMM?</div>
+        <div class="cta-sub">Расскажите о проекте. Поможем выстроить коммуникацию и создать систему контента, которая будет работать на цели вашего бизнеса.</div>
+        <div class="form"><input type="text" placeholder="Имя"><input type="text" placeholder="Телефон или email"><textarea placeholder="Расскажите о проекте: ниша, платформы, цели"></textarea><button class="btn-primary">Получить предложение</button><div class="form-note">Ответим в течение одного рабочего дня</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MARKETING ==================== -->
+  <div class="page-section" id="page-marketing">
+    <div class="page-header"><div><div class="page-header-title">Страница Marketing</div><div class="page-header-sub">7 блоков · Детальный вайрфрейм</div></div></div>
+    <div class="wf">
+      <div class="wf-nav"><div class="wf-logo">Future</div><div class="wf-nav-links"><div class="wf-nav-dropdown"><a href="#" style="cursor:pointer">Услуги ▾</a><div class="wf-nav-dropdown-menu"><a href="#" onclick="goToPage('smm');return false;">SMM</a><a href="#" onclick="goToPage('marketing');return false;">Marketing</a><a href="#" onclick="goToPage('branding');return false;">Branding</a><a href="#" onclick="goToPage('production');return false;">Production</a></div></div><a href="#" onclick="goToPage('portfolio');return false;">Кейсы</a><a href="#" onclick="goToPage('about');return false;">О нас</a><a href="#" onclick="goToPage('blog');return false;">Блог</a></div><div class="wf-nav-cta">Оставить заявку</div></div>
+      <div class="divider-label">① HERO <span class="interact-badge">фоновые 3D объекты движутся при скролле · видео открывается на странице без перехода</span></div>
+      <div class="hero">
+        <div class="hero-breadcrumb">Главная / Услуги / Marketing</div>
+        <div class="hero-h">Интернет-маркетинг и лидогенерация: от стратегии до заявок</div>
+        <div class="hero-sub">Мы изучаем задачу, собираем стратегию продвижения и запускаем рекламу, которая помогает привлекать внимание нужной аудитории и получать обращения от потенциальных клиентов.</div>
+        <div class="hero-btns"><button class="btn-primary">Получить медиаплан</button><button class="btn-secondary" onclick="goToPage('portfolio')">Наши работы</button></div>
+        <div class="tools-row"><span class="tool-chip">Google Ads</span><span class="tool-chip">Meta Ads</span><span class="tool-chip">Яндекс.Директ</span><span class="tool-chip">SEO</span><span class="tool-chip">Programmatic</span><span class="tool-chip">Analytics</span></div>
+      </div>
+      <div class="divider-label">② RESULTS</div>
+      <div class="section">
+        <div class="section-label">В цифрах</div>
+        <div class="stats-row">
+          <div class="stat"><div class="stat-num">$30K</div><div class="stat-label">сэкономлено для Яндекс.Такси</div></div>
+          <div class="stat"><div class="stat-num">10,5M</div><div class="stat-label">показов eGov за 1 месяц</div></div>
+          <div class="stat"><div class="stat-num">330</div><div class="stat-label">трудоустроено через Яндекс.Еда</div></div>
+        </div>
+      </div>
+      <div class="divider-label">③ INCLUDED</div>
+      <div class="section">
+        <div class="section-label">Состав услуги</div>
+        <div class="section-title">Что входит в маркетинговое сопровождение</div>
+        <div class="svc-item"><div class="svc-icon">🗺</div><div><div class="svc-title">Маркетинговая стратегия</div><div class="svc-desc">Анализ рынка, аудитории и конкурентов.</div></div></div>
+        <div class="svc-item"><div class="svc-icon">📄</div><div><div class="svc-title">Медиапланирование</div><div class="svc-desc">Подбор каналов продвижения, планирование бюджета и прогноз результатов.</div></div></div>
+        <div class="svc-item"><div class="svc-icon">🔍</div><div><div class="svc-title">Контекстная реклама</div><div class="svc-desc">Реклама в поисковой выдаче для людей, которые уже ищут ваш продукт или услугу.</div></div></div>
+        <div class="svc-item"><div class="svc-icon">📣</div><div><div class="svc-title">Таргетированная реклама</div><div class="svc-desc">Реклама в социальных сетях с настройкой, креативами и аналитикой.</div></div></div>
+        <div class="svc-item"><div class="svc-icon">📊</div><div><div class="svc-title">Аналитика и отчетность</div><div class="svc-desc">Сбор данных, анализ результатов и подготовка отчетности.</div></div></div>
+      </div>
+      <div class="divider-label">④ APPROACH</div>
+      <div class="section">
+        <div class="section-label">Как мы работаем</div>
+        <div class="section-title">Как строится работа</div>
+        <div class="process-steps">
+          <div class="step"><div class="step-num">01</div><div><div class="step-title">Аудит и цели</div><div class="step-desc">Изучаем текущее состояние, формируем KPI и бюджет.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div><div class="step-title">Стратегия и медиаплан</div><div class="step-desc">Выбираем каналы и инструменты под конкретную задачу.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div><div class="step-title">Запуск кампаний</div><div class="step-desc">Создаём объявления, настраиваем аналитику, запускаем.</div></div></div>
+          <div class="step"><div class="step-num">04</div><div><div class="step-title">Оптимизация</div><div class="step-desc">Еженедельно анализируем данные и улучшаем результат.</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑤ CASES</div>
+      <div class="section">
+        <div class="section-label">Примеры работ</div>
+        <div class="cases-grid">
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">Tytan</div><div class="case-result">Performance-маркетинг</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">Tess</div><div class="case-result">Performance-маркетинг</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">Asia Park</div><div class="case-result">Медиапланирование</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑥ TEAM <span class="interact-badge">карточки команды листаются в карусели</span></div>
+      <div class="section">
+        <div class="section-title">Команда, которая будет работать над вашим проектом</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Евгений Никонов</div><div style="font-size:10px;color:var(--text3)">CEO</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Сергей Романов</div><div style="font-size:10px;color:var(--text3)">Тех. директор, AI</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Арина Арсланова</div><div style="font-size:10px;color:var(--text3)">Креативный директор</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Мадина Нусипалиева</div><div style="font-size:10px;color:var(--text3)">PR-менеджер</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Айрат Рахматуллин</div><div style="font-size:10px;color:var(--text3)">Маркетолог, SEO, таргетолог</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Дмитрий Смирнов</div><div style="font-size:10px;color:var(--text3)">Маркетолог, таргетолог</div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑦ CTA</div>
+      <div class="cta-block">
+        <div class="cta-title">Нужен медиаплан под вашу задачу?</div>
+        <div class="cta-sub">Обсудим задачу и предложим верный подход.</div>
+        <div class="form"><input type="text" placeholder="Имя"><input type="text" placeholder="Телефон или email"><textarea placeholder="Ниша, цели, текущий бюджет на рекламу"></textarea><button class="btn-primary">Получить медиаплан</button><div class="form-note">Ответим в течение одного рабочего дня</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== BRANDING ==================== -->
+  <div class="page-section" id="page-branding">
+    <div class="page-header"><div><div class="page-header-title">Страница Branding</div><div class="page-header-sub">7 блоков · Детальный вайрфрейм</div></div></div>
+    <div class="wf">
+      <div class="wf-nav"><div class="wf-logo">Future</div><div class="wf-nav-links"><div class="wf-nav-dropdown"><a href="#" style="cursor:pointer">Услуги ▾</a><div class="wf-nav-dropdown-menu"><a href="#" onclick="goToPage('smm');return false;">SMM</a><a href="#" onclick="goToPage('marketing');return false;">Marketing</a><a href="#" onclick="goToPage('branding');return false;">Branding</a><a href="#" onclick="goToPage('production');return false;">Production</a></div></div><a href="#" onclick="goToPage('portfolio');return false;">Кейсы</a><a href="#" onclick="goToPage('about');return false;">О нас</a><a href="#" onclick="goToPage('blog');return false;">Блог</a></div><div class="wf-nav-cta">Оставить заявку</div></div>
+      <div class="divider-label">① HERO <span class="interact-badge">фоновые 3D объекты движутся при скролле · видео открывается на странице без перехода</span></div>
+      <div class="hero">
+        <div class="hero-breadcrumb">Главная / Услуги / Branding</div>
+        <div class="hero-h">Помогаем брендам быть узнаваемыми для своих людей</div>
+        <div class="hero-sub">Фирменный стиль — это первое, что видят люди при знакомстве с брендом. От этого впечатления зависит, запомнят вас и захотят ли познакомиться ближе. Нейминг, концепция, логотип, фирстиль, брендбук, упаковка — все под ключ.</div>
+        <div class="hero-btns"><button class="btn-primary">Обсудить проект</button><button class="btn-secondary" onclick="goToPage('portfolio')">Наши работы</button></div>
+      </div>
+      <div class="divider-label">② DELIVERABLES</div>
+      <div class="section">
+        <div class="section-label">Состав услуги</div>
+        <div class="section-title">Из чего складывается визуальный портрет вашего бренда</div>
+        <div class="deliverables">
+          <div class="deliv"><div class="deliv-icon">🏷</div><div class="deliv-title">Нейминг</div><div class="deliv-desc">Название, которое легко запомнить, использовать и развивать вместе с брендом.</div></div>
+          <div class="deliv"><div class="deliv-icon">🎯</div><div class="deliv-title">Платформа бренда</div><div class="deliv-desc">Позиционирование, ценности, характер бренда и принципы коммуникации.</div></div>
+          <div class="deliv"><div class="deliv-icon">✏️</div><div class="deliv-title">Логотип</div><div class="deliv-desc">Визуальный знак, который помогает узнавать бренд и отличать его от других.</div></div>
+          <div class="deliv"><div class="deliv-icon">🎨</div><div class="deliv-title">Фирменный стиль</div><div class="deliv-desc">Цвета, шрифты, графические элементы и визуальная система бренда.</div></div>
+          <div class="deliv"><div class="deliv-icon">📦</div><div class="deliv-title">Упаковка</div><div class="deliv-desc">Дизайн, который помогает продукту выделяться на полке и быть узнаваемым.</div></div>
+          <div class="deliv"><div class="deliv-icon">📖</div><div class="deliv-title">Брендбук и гайдлайны</div><div class="deliv-desc">Правила использования всех элементов бренда для команды и подрядчиков.</div></div>
+        </div>
+      </div>
+      <div class="divider-label">③ TYPES</div>
+      <div class="section">
+        <div class="section-label">Что мы закрываем</div>
+        <div class="types-grid">
+          <div class="type-card"><div class="type-title">Создание с нуля</div><div class="type-desc">Полная айдентика от позиционирования до носителей.</div></div>
+          <div class="type-card"><div class="type-title">Ребрендинг</div><div class="type-desc">Обновление стиля без потери узнаваемости бренда.</div></div>
+          <div class="type-card"><div class="type-title">Продуктовый брендинг</div><div class="type-desc">Упаковка, этикетки, дизайн линейки для полок и e-com.</div></div>
+          <div class="type-card"><div class="type-title">Корпоративный брендинг</div><div class="type-desc">Айдентика для B2B, девелопмента, финансов.</div></div>
+        </div>
+      </div>
+      <div class="divider-label">④ PROCESS</div>
+      <div class="section">
+        <div class="section-label">Процесс работы</div>
+        <div class="section-title">Как строится работа</div>
+        <div class="process-steps">
+          <div class="step"><div class="step-num">01</div><div><div class="step-title">Знакомство с брендом</div><div class="step-desc">Изучаем компанию, аудиторию, рынок и задачи проекта.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div><div class="step-title">Формируем основу</div><div class="step-desc">Определяем позиционирование, характер бренда и ключевые смыслы.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div><div class="step-title">Разрабатываем концепции</div><div class="step-desc">Создаем несколько визуальных направлений и выбираем наиболее подходящее решение.</div></div></div>
+          <div class="step"><div class="step-num">04</div><div><div class="step-title">Собираем систему бренда</div><div class="step-desc">Формируем логотип, фирменный стиль, графику и носители.</div></div></div>
+          <div class="step"><div class="step-num">05</div><div><div class="step-title">Готовим бренд к запуску</div><div class="step-desc">Передаем брендбук, гайдлайны и примеры использования айдентики.</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑤ CASES</div>
+      <div class="section">
+        <div class="section-label">Примеры работ</div>
+        <div class="cases-grid">
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">Bereke Bank</div><div class="case-result">Брендинг</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">KIF</div><div class="case-result">Брендинг</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">TEDx</div><div class="case-result">Брендинг</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-title">SENIM Hospital</div><div class="case-result">Брендинг</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑥ TEAM <span class="interact-badge">карточки команды листаются в карусели</span></div>
+      <div class="section">
+        <div class="section-title">Команда, которая будет работать над вашим проектом</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Евгений Никонов</div><div style="font-size:10px;color:var(--text3)">CEO</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Сергей Романов</div><div style="font-size:10px;color:var(--text3)">Тех. директор, AI</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Арсений Сементеев</div><div style="font-size:10px;color:var(--text3)">Арт-директор</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Арина Арсланова</div><div style="font-size:10px;color:var(--text3)">Креативный директор</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Алина Ерофеева</div><div style="font-size:10px;color:var(--text3)">Дизайнер</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Милана Шаяхметова</div><div style="font-size:10px;color:var(--text3)">Дизайнер</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Алексей Хомячук</div><div style="font-size:10px;color:var(--text3)">Копирайтер, креатор</div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑦ CTA</div>
+      <div class="cta-block">
+        <div class="cta-title">Готовы обсудить оформление бренда?</div>
+        <div class="cta-sub">Расскажите о проекте. Предложим формат, соберём команду и подготовим решение под ваши цели.</div>
+        <div class="form"><input type="text" placeholder="Имя"><input type="text" placeholder="Телефон или email"><textarea placeholder="Что нужно: новый бренд, ребрендинг, упаковка?"></textarea><button class="btn-primary">Отправить заявку</button><div class="form-note">Ответим в течение одного рабочего дня</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PRODUCTION ==================== -->
+  <div class="page-section" id="page-production">
+    <div class="page-header"><div><div class="page-header-title">Страница Production</div><div class="page-header-sub">6 блоков · Детальный вайрфрейм</div></div></div>
+    <div class="wf">
+      <div class="wf-nav"><div class="wf-logo">Future</div><div class="wf-nav-links"><div class="wf-nav-dropdown"><a href="#" style="cursor:pointer">Услуги ▾</a><div class="wf-nav-dropdown-menu"><a href="#" onclick="goToPage('smm');return false;">SMM</a><a href="#" onclick="goToPage('marketing');return false;">Marketing</a><a href="#" onclick="goToPage('branding');return false;">Branding</a><a href="#" onclick="goToPage('production');return false;">Production</a></div></div><a href="#" onclick="goToPage('portfolio');return false;">Кейсы</a><a href="#" onclick="goToPage('about');return false;">О нас</a><a href="#" onclick="goToPage('blog');return false;">Блог</a></div><div class="wf-nav-cta">Оставить заявку</div></div>
+      <div class="divider-label">① HERO <span class="interact-badge">фоновые 3D объекты движутся при скролле · видео открывается на странице без перехода</span></div>
+      <div class="hero">
+        <div class="hero-breadcrumb">Главная / Услуги / Production</div>
+        <div class="hero-h">Контент, который помогает брендам находить своих людей</div>
+        <div class="hero-sub">Создаём видео, рекламные ролики, контент для социальных сетей и AI-проекты. От идеи и сценария до готового материала.</div>
+        <div class="hero-btns"><button class="btn-primary">Обсудить видео</button><button class="btn-secondary" onclick="goToPage('portfolio')">Смотреть работы</button></div>
+        <div class="showreel"><div class="play-btn" style="font-size:18px">▶</div><div><div class="showreel-label">Showreel 2024</div><div class="showreel-sub">Лучшие работы · 2 мин</div></div></div>
+      </div>
+      <div class="divider-label">② FORMATS</div>
+      <div class="section">
+        <div class="section-label">Что снимаем</div>
+        <div class="section-title">Чем мы можем вам помочь</div>
+        <div class="formats-grid">
+          <div class="format-card"><div class="format-icon">📺</div><div class="format-title">Рекламный ролик</div><div class="format-desc">ТВ и digital. Полный цикл: сценарий, кастинг, съёмка, постпродакшн.</div></div>
+          <div class="format-card"><div class="format-icon">🏢</div><div class="format-title">Корпоративный фильм</div><div class="format-desc">О компании, продукте, команде. Для сайта и инвесторов.</div></div>
+          <div class="format-card"><div class="format-icon">📱</div><div class="format-title">Reels и shorts</div><div class="format-desc">Вертикальный формат для Instagram, TikTok, YouTube Shorts.</div></div>
+          <div class="format-card"><div class="format-icon">✨</div><div class="format-title">Motion и 3D</div><div class="format-desc">Анимация, инфографика, 3D-визуализация.</div></div>
+          <div class="format-card"><div class="format-icon">🤖</div><div class="format-title">AI Production</div><div class="format-desc">Контент с использованием ИИ, цифровых персонажей и новых технологий.</div></div>
+          <div class="format-card"><div class="format-icon">📷</div><div class="format-title">Фотосъёмка</div><div class="format-desc">Продуктовая, предметная, репортажная, имиджевая.</div></div>
+        </div>
+      </div>
+      <div class="divider-label">③ PROCESS</div>
+      <div class="section">
+        <div class="section-label">Как работаем</div>
+        <div class="section-title">От идеи до готового ролика</div>
+        <div class="process-steps">
+          <div class="step"><div class="step-num">01</div><div><div class="step-title">Бриф</div><div class="step-desc">Цель, аудитория, платформа, бюджет, сроки.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div><div class="step-title">Сценарий и раскадровка</div><div class="step-desc">Пишем сценарий, рисуем storyboard, согласовываем.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div><div class="step-title">Препродакшн</div><div class="step-desc">Кастинг, локации, реквизит, смета.</div></div></div>
+          <div class="step"><div class="step-num">04</div><div><div class="step-title">Съёмка</div><div class="step-desc">Один или несколько съёмочных дней.</div></div></div>
+          <div class="step"><div class="step-num">05</div><div><div class="step-title">Постпродакшн</div><div class="step-desc">Монтаж, цветокоррекция, озвучка, музыка.</div></div></div>
+          <div class="step"><div class="step-num">06</div><div><div class="step-title">Сдача и продвижение</div><div class="step-desc">Финальный файл во всех форматах. Запуск на платформах.</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">④ WORKS</div>
+      <div class="section">
+        <div class="section-label">Примеры видео</div>
+        <div class="reel-grid">
+          <div class="reel-thumb"><div class="reel-play">▶</div><div class="reel-label">Hochland</div></div>
+          <div class="reel-thumb"><div class="reel-play">▶</div><div class="reel-label">Fawori</div></div>
+          <div class="reel-thumb"><div class="reel-play">▶</div><div class="reel-label">TYTAN</div></div>
+          <div class="reel-thumb"><div class="reel-play">▶</div><div class="reel-label">Carlsberg</div></div>
+          <div class="reel-thumb"><div class="reel-play">▶</div><div class="reel-label">Технониколь</div></div>
+          <div class="reel-thumb"><div class="reel-play">▶</div><div class="reel-label">SIKA</div></div>
+          <div class="reel-thumb"><div class="reel-play">▶</div><div class="reel-label">ВТБ</div></div>
+          <div class="reel-thumb"><div class="reel-play">▶</div><div class="reel-label">Jaguar LR</div></div>
+          <div class="reel-thumb"><div class="reel-play">▶</div><div class="reel-label">TEDx</div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑤ TEAM <span class="interact-badge">карточки команды листаются в карусели</span></div>
+      <div class="section">
+        <div class="section-title">Команда, которая будет работать над вашим проектом</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Евгений Никонов</div><div style="font-size:10px;color:var(--text3)">CEO</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Сергей Романов</div><div style="font-size:10px;color:var(--text3)">Тех. директор, AI</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Арсений Сементеев</div><div style="font-size:10px;color:var(--text3)">Арт-директор</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Мадина Нусипалиева</div><div style="font-size:10px;color:var(--text3)">PR-менеджер</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Алексей Хомячук</div><div style="font-size:10px;color:var(--text3)">Копирайтер</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center"><div style="width:36px;height:36px;border-radius:50%;background:var(--border);margin:0 auto 6px"></div><div style="font-size:11px;font-weight:500">Милана Шаяхметова</div><div style="font-size:10px;color:var(--text3)">Видеограф</div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑥ CTA</div>
+      <div class="cta-block">
+        <div class="cta-title">Есть задача для продакшна?</div>
+        <div class="cta-sub">Расскажите о проекте. Предложим формат, соберём команду и подготовим решение под ваши цели.</div>
+        <div class="form"><input type="text" placeholder="Имя"><input type="text" placeholder="Телефон или email"><select><option>Формат: рекламный ролик</option><option>Корпоративный фильм</option><option>Reels / shorts</option><option>Motion / 3D</option><option>Фотосъёмка</option></select><textarea placeholder="Цель, аудитория, сроки, бюджет"></textarea><button class="btn-primary">Получить смету</button><div class="form-note">Ответим в течение одного рабочего дня</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PORTFOLIO ==================== -->
+  <div class="page-section" id="page-portfolio">
+    <div class="page-header"><div><div class="page-header-title">Страница Кейсы / Портфолио</div><div class="page-header-sub">4 блока · Детальный вайрфрейм</div></div></div>
+    <div class="wf">
+      <div class="wf-nav"><div class="wf-logo">Future</div><div class="wf-nav-links"><div class="wf-nav-dropdown"><a href="#" style="cursor:pointer">Услуги ▾</a><div class="wf-nav-dropdown-menu"><a href="#" onclick="goToPage('smm');return false;">SMM</a><a href="#" onclick="goToPage('marketing');return false;">Marketing</a><a href="#" onclick="goToPage('branding');return false;">Branding</a><a href="#" onclick="goToPage('production');return false;">Production</a></div></div><a href="#" onclick="goToPage('portfolio');return false;">Кейсы</a><a href="#" onclick="goToPage('about');return false;">О нас</a><a href="#" onclick="goToPage('blog');return false;">Блог</a></div><div class="wf-nav-cta">Оставить заявку</div></div>
+      <div class="divider-label">① HERO <span class="interact-badge">фоновые 3D объекты движутся при скролле · видео открывается на странице без перехода</span></div>
+      <div class="hero">
+        <div class="hero-breadcrumb">Главная / Кейсы</div>
+        <div class="hero-h">150+ реализованных проектов</div>
+        <div class="hero-sub">SMM, маркетинг, брендинг, продакшн — для брендов Казахстана, Болгарии, России и Азербайджана. Каждый бренд ищет своих людей по-своему.</div>
+      </div>
+      <div class="divider-label">② FILTERS</div>
+      <div class="section">
+        <div class="filter-row"><span class="filter-label">Услуга</span><span class="filter-chip active">Все</span><span class="filter-chip">SMM</span><span class="filter-chip">Marketing</span><span class="filter-chip">Branding</span><span class="filter-chip">Production</span></div>
+        <div class="filter-row"><span class="filter-label">Сфера</span><span class="filter-chip active">Все</span><span class="filter-chip">FMCG</span><span class="filter-chip">Стройка</span><span class="filter-chip">Авто</span><span class="filter-chip">Образование</span><span class="filter-chip">Финансы</span><span class="filter-chip">Медицина</span><span class="filter-chip">HoReCa</span></div>
+        <input class="search-input" type="text" placeholder="Поиск по названию клиента или задаче..." style="margin-top:4px">
+      </div>
+      <div class="divider-label">③ CASES GRID</div>
+      <div class="section">
+        <div class="cases-grid">
+          <div class="case-card"><div class="case-img"><span class="case-type-badge">SMM</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">Jaguar & Land Rover</div><div class="case-title">Тихая роскошь</div><div class="case-result">SMM · Авто</div><div class="case-link">Читать кейс →</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-type-badge">SMM</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">Pepero</div><div class="case-title">Запуск бренда в Казахстане</div><div class="case-result">SMM · FMCG</div><div class="case-link">Читать кейс →</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-type-badge">Branding</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">Bereke Bank</div><div class="case-title">Брендинг</div><div class="case-result">Branding · Финансы</div><div class="case-link">Читать кейс →</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-type-badge">Marketing</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">Tytan</div><div class="case-title">Performance-маркетинг</div><div class="case-result">Marketing · Стройка</div><div class="case-link">Читать кейс →</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-type-badge">Production</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">Hochland</div><div class="case-title">Продакшн</div><div class="case-result">Production · FMCG</div><div class="case-link">Читать кейс →</div></div></div>
+          <div class="case-card"><div class="case-img"><span class="case-type-badge">Branding</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">TEDx</div><div class="case-title">Брендинг и продакшн</div><div class="case-result">Branding · Образование</div><div class="case-link">Читать кейс →</div></div></div>
+        </div>
+      </div>
+      <div class="load-more"><button class="btn-secondary">Загрузить ещё кейсы</button></div>
+      <div class="divider-label">④ CTA</div>
+      <div class="cta-block">
+        <div class="cta-title">Хотите такой же результат?</div>
+        <div class="cta-sub">Каждый проект начинается с разговора. Расскажите о бренде — вместе подумаем, как помочь вам найти своих людей.</div>
+        <button class="btn-primary">Обсудить проект</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== О НАС ==================== -->
+  <div class="page-section" id="page-about">
+    <div class="page-header"><div><div class="page-header-title">Страница О нас</div><div class="page-header-sub">8 блоков · Детальный вайрфрейм</div></div></div>
+    <div class="wf">
+      <div class="wf-nav"><div class="wf-logo">Future</div><div class="wf-nav-links"><div class="wf-nav-dropdown"><a href="#" style="cursor:pointer">Услуги ▾</a><div class="wf-nav-dropdown-menu"><a href="#" onclick="goToPage('smm');return false;">SMM</a><a href="#" onclick="goToPage('marketing');return false;">Marketing</a><a href="#" onclick="goToPage('branding');return false;">Branding</a><a href="#" onclick="goToPage('production');return false;">Production</a></div></div><a href="#" onclick="goToPage('portfolio');return false;">Кейсы</a><a href="#" onclick="goToPage('about');return false;">О нас</a><a href="#" onclick="goToPage('blog');return false;">Блог</a></div><div class="wf-nav-cta">Свяжитесь с нами</div></div>
+      <div class="divider-label">① HERO <span class="interact-badge">фоновые 3D объекты движутся при скролле · видео открывается на странице без перехода</span></div>
+      <div class="hero">
+        <div class="hero-breadcrumb">Главная / О нас</div>
+        <div class="hero-h">Помогаем брендам находить своих людей</div>
+        <div class="hero-sub">Future — рекламное агентство из Алматы. Уже более 8 лет мы работаем с брендами, которым важно не просто быть заметными, а быть понятными и нужными своим людям.</div>
+      </div>
+      <div class="divider-label">② ABOUT</div>
+      <div class="section">
+        <div class="section-title">Нам не всё равно</div>
+        <div class="section-sub">Мы верим в индивидуальность каждого бренда и каждой истории, которая за ним стоит. Иногда клиент приходит за рекламой, а оказывается, что бренду нужна новая стратегия.</div>
+      </div>
+      <div class="divider-label">③ WHY US</div>
+      <div class="section">
+        <div class="section-title">Почему бренды работают с Future</div>
+        <div class="process-steps">
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">8 лет опыта</div></div></div>
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">KPI в договоре</div></div></div>
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">Собственная команда</div></div></div>
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">Соблюдаем сроки</div></div></div>
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">Международная экспертиза</div></div></div>
+          <div class="step"><div class="step-num">→</div><div><div class="step-title">Погружаемся глубже брифа</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">④ TEAM</div>
+      <div class="section">
+        <div class="section-title">Команда Future</div>
+        <div class="section-sub">Мы разные по опыту, характеру и профессиональному пути. Но нас объединяет одно — желание создавать проекты, которые помогают бизнесу и людям находить друг друга.</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px">
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center"><div style="width:40px;height:40px;border-radius:50%;background:var(--border);margin:0 auto 8px"></div><div style="font-size:12px;font-weight:500;color:var(--text)">Евгений Никонов</div><div style="font-size:11px;color:var(--text3)">CEO, Креативный директор</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center"><div style="width:40px;height:40px;border-radius:50%;background:var(--border);margin:0 auto 8px"></div><div style="font-size:12px;font-weight:500;color:var(--text)">Сергей Романов</div><div style="font-size:11px;color:var(--text3)">Технический директор, AI</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center"><div style="width:40px;height:40px;border-radius:50%;background:var(--border);margin:0 auto 8px"></div><div style="font-size:12px;font-weight:500;color:var(--text)">Арсений Сементеев</div><div style="font-size:11px;color:var(--text3)">Арт-директор</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center"><div style="width:40px;height:40px;border-radius:50%;background:var(--border);margin:0 auto 8px"></div><div style="font-size:12px;font-weight:500;color:var(--text)">Арина Арсланова</div><div style="font-size:11px;color:var(--text3)">Креативный директор</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center"><div style="width:40px;height:40px;border-radius:50%;background:var(--border);margin:0 auto 8px"></div><div style="font-size:12px;font-weight:500;color:var(--text)">Мадина Нусипалиева</div><div style="font-size:11px;color:var(--text3)">PR-менеджер, менеджер проектов</div></div>
+          <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center"><div style="width:40px;height:40px;border-radius:50%;background:var(--border);margin:0 auto 8px"></div><div style="font-size:12px;font-weight:500;color:var(--text)">Фаталиева Сабина</div><div style="font-size:11px;color:var(--text3)">Представитель в Азербайджане</div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑤ CULTURE</div>
+      <div class="section">
+        <div class="section-title">Что для нас важно</div>
+        <div class="process-steps">
+          <div class="step"><div class="step-num">01</div><div><div class="step-title">Честность</div><div class="step-desc">Если идея не работает, мы об этом говорим.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div><div class="step-title">Ответственность</div><div class="step-desc">Берём задачи, за которые готовы отвечать результатом.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div><div class="step-title">Любопытство</div><div class="step-desc">Хороший маркетинг начинается с интереса к людям и их поведению.</div></div></div>
+          <div class="step"><div class="step-num">04</div><div><div class="step-title">Командная работа</div><div class="step-desc">Лучшие проекты рождаются на стыке разных взглядов и экспертиз.</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑥ GEOGRAPHY</div>
+      <div class="section">
+        <div class="section-title">География команды</div>
+        <div class="stats-grid">
+          <div class="stat"><div class="stat-num">KZ</div><div class="stat-label">Казахстан, Алматы</div></div>
+          <div class="stat"><div class="stat-num">BG</div><div class="stat-label">Болгария, София</div></div>
+          <div class="stat"><div class="stat-num">UZ</div><div class="stat-label">Узбекистан, Ташкент</div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑦ VALUES</div>
+      <div class="section">
+        <div class="section-title">Несколько вещей, в которые мы верим</div>
+        <div class="process-steps">
+          <div class="step"><div class="step-num">—</div><div><div class="step-title">Люди чувствуют фальшь быстрее, чем кажется</div></div></div>
+          <div class="step"><div class="step-num">—</div><div><div class="step-title">Хорошие проекты строятся на доверии</div></div></div>
+          <div class="step"><div class="step-num">—</div><div><div class="step-title">Сначала понять. Потом делать.</div></div></div>
+          <div class="step"><div class="step-num">—</div><div><div class="step-title">Маркетинг начинается с интереса к людям</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑧ CTA</div>
+      <div class="cta-block">
+        <div class="cta-title">Давайте знакомиться</div>
+        <div class="cta-sub">Если вам нужен партнёр, который погрузится в задачу — нам точно есть о чём поговорить.</div>
+        <button class="btn-primary">Обсудить проект</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== БЛОГ ==================== -->
+  <div class="page-section" id="page-blog">
+    <div class="page-header"><div><div class="page-header-title">Страница Блог</div><div class="page-header-sub">3 блока · Детальный вайрфрейм</div></div></div>
+    <div class="wf">
+      <div class="wf-nav"><div class="wf-logo">Future</div><div class="wf-nav-links"><div class="wf-nav-dropdown"><a href="#" style="cursor:pointer">Услуги ▾</a><div class="wf-nav-dropdown-menu"><a href="#" onclick="goToPage('smm');return false;">SMM</a><a href="#" onclick="goToPage('marketing');return false;">Marketing</a><a href="#" onclick="goToPage('branding');return false;">Branding</a><a href="#" onclick="goToPage('production');return false;">Production</a></div></div><a href="#" onclick="goToPage('portfolio');return false;">Кейсы</a><a href="#" onclick="goToPage('about');return false;">О нас</a><a href="#" onclick="goToPage('blog');return false;">Блог</a></div><div class="wf-nav-cta">Свяжитесь с нами</div></div>
+      <div class="divider-label">① HERO</div>
+      <div class="hero">
+        <div class="hero-breadcrumb">Главная / Блог</div>
+        <div class="hero-h">Блог Future Agency</div>
+        <div class="hero-sub">Полезности, лайфхаки и немного текста — о маркетинге, брендинге и жизни агентства</div>
+      </div>
+      <div class="divider-label">② ARTICLES GRID</div>
+      <div class="section">
+        <div class="filter-row">
+          <span class="filter-chip active">Все</span>
+          <span class="filter-chip">SMM</span>
+          <span class="filter-chip">Marketing</span>
+          <span class="filter-chip">Branding</span>
+          <span class="filter-chip">Production</span>
+          <span class="filter-chip">Агентство</span>
+        </div>
+        <div class="cases-grid" style="margin-top:12px">
+          <div class="case-card"><div class="case-img" style="height:90px"><span class="case-type-badge">SMM</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">18.12.2023</div><div class="case-title">Наш первый успех на Tagline Awards 2023: золото и бронза</div><div class="case-link">Читать →</div></div></div>
+          <div class="case-card"><div class="case-img" style="height:90px"><span class="case-type-badge">Branding</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">22.10.2024</div><div class="case-title">Логотип и брендбук: инвестиции в будущее вашего бизнеса</div><div class="case-link">Читать →</div></div></div>
+          <div class="case-card"><div class="case-img" style="height:90px"><span class="case-type-badge">Marketing</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">10.10.2023</div><div class="case-title">Почему реклама в интернете начинает работать через две недели?</div><div class="case-link">Читать →</div></div></div>
+          <div class="case-card"><div class="case-img" style="height:90px"><span class="case-type-badge">Branding</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">11.03.2024</div><div class="case-title">Брендинг продукта в Казахстане: цели, задачи и этапы разработки</div><div class="case-link">Читать →</div></div></div>
+          <div class="case-card"><div class="case-img" style="height:90px"><span class="case-type-badge">SMM</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">2024</div><div class="case-title">SMM в Instagram: про стратегию и инструменты продвижения</div><div class="case-link">Читать →</div></div></div>
+          <div class="case-card"><div class="case-img" style="height:90px"><span class="case-type-badge">Агентство</span><span class="case-img-lbl">Обложка</span></div><div class="case-body"><div class="case-client">2024</div><div class="case-title">Здравый смысл или треш — как мы выбираем идеи для проектов</div><div class="case-link">Читать →</div></div></div>
+        </div>
+      </div>
+      <div class="load-more"><button class="btn-secondary">Загрузить ещё статьи</button></div>
+    </div>
+  </div>
+
+  <!-- ==================== КЕЙС (ПРИМЕР) ==================== -->
+  <div class="page-section" id="page-case">
+    <div class="page-header"><div><div class="page-header-title">Детальная страница кейса</div><div class="page-header-sub">7 блоков · Пример: Jaguar & Land Rover</div></div></div>
+    <div class="wf">
+      <div class="wf-nav"><div class="wf-logo">Future</div><div class="wf-nav-links"><div class="wf-nav-dropdown"><a href="#" style="cursor:pointer">Услуги ▾</a><div class="wf-nav-dropdown-menu"><a href="#" onclick="goToPage('smm');return false;">SMM</a><a href="#" onclick="goToPage('marketing');return false;">Marketing</a><a href="#" onclick="goToPage('branding');return false;">Branding</a><a href="#" onclick="goToPage('production');return false;">Production</a></div></div><a href="#" onclick="goToPage('portfolio');return false;">Кейсы</a><a href="#" onclick="goToPage('about');return false;">О нас</a><a href="#" onclick="goToPage('blog');return false;">Блог</a></div><div class="wf-nav-cta">Свяжитесь с нами</div></div>
+      <div class="divider-label">① HERO</div>
+      <div class="hero">
+        <div class="hero-breadcrumb">Главная / Кейсы / Jaguar & Land Rover</div>
+        <div class="hero-h">Jaguar & Land Rover</div>
+        <div class="hero-sub">Премиальный бренд, который говорит с аудиторией на одном языке</div>
+        <div style="display:flex;gap:8px;margin-top:12px"><span class="tag" style="font-size:11px;padding:4px 10px">SMM</span><span class="tag" style="font-size:11px;padding:4px 10px">Авто</span></div>
+      </div>
+      <div class="divider-label">② INTRO</div>
+      <div class="section">
+        <div class="section-title">Великолепию не нужно заявлять о себе громко</div>
+        <div class="section-sub">Jaguar и Land Rover не нуждаются в дополнительном представлении. Но официальному дилеру в Алматы было важно выстроить собственное присутствие в социальных сетях и сделать его таким же сильным, как сами бренды.</div>
+      </div>
+      <div class="divider-label">③ IDEA</div>
+      <div class="section">
+        <div class="section-title">Тихая роскошь</div>
+        <div class="section-sub">Главная идея проекта родилась довольно быстро. Социальные сети не должны были становиться ещё одной рекламной площадкой. Наша задача — сохранить характер премиального бренда и при этом сделать его ближе локальной аудитории.</div>
+      </div>
+      <div class="divider-label">④ WHAT WAS DONE</div>
+      <div class="section">
+        <div class="section-title">Что было сделано</div>
+        <div class="process-steps">
+          <div class="step"><div class="step-num">—</div><div><div class="step-title">Разработка контент-стратегии</div></div></div>
+          <div class="step"><div class="step-num">—</div><div><div class="step-title">Ведение социальных сетей</div></div></div>
+          <div class="step"><div class="step-num">—</div><div><div class="step-title">Фото- и видеопродакшн</div></div></div>
+          <div class="step"><div class="step-num">—</div><div><div class="step-title">Создание визуальной системы аккаунта</div></div></div>
+          <div class="step"><div class="step-num">—</div><div><div class="step-title">Работа с блогерами Казахстана</div></div></div>
+          <div class="step"><div class="step-num">—</div><div><div class="step-title">Регулярный контент для Instagram</div></div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑤ GALLERY <span class="interact-badge">сетка фотографий / видео</span></div>
+      <div class="section">
+        <div class="section-label">Красота в деталях</div>
+        <div class="reel-grid">
+          <div class="reel-thumb" style="height:90px"><div class="reel-play" style="font-size:22px">🖼</div><div class="reel-label">Фото 1</div></div>
+          <div class="reel-thumb" style="height:90px"><div class="reel-play" style="font-size:22px">🖼</div><div class="reel-label">Фото 2</div></div>
+          <div class="reel-thumb" style="height:90px"><div class="reel-play" style="font-size:22px">🖼</div><div class="reel-label">Фото 3</div></div>
+          <div class="reel-thumb" style="height:90px"><div class="reel-play" style="font-size:22px">▶</div><div class="reel-label">Видео</div></div>
+          <div class="reel-thumb" style="height:90px"><div class="reel-play" style="font-size:22px">🖼</div><div class="reel-label">Фото 4</div></div>
+          <div class="reel-thumb" style="height:90px"><div class="reel-play" style="font-size:22px">🖼</div><div class="reel-label">Фото 5</div></div>
+        </div>
+      </div>
+      <div class="divider-label">⑥ RESULT</div>
+      <div class="section">
+        <div class="section-title">Что получилось</div>
+        <div class="section-sub">Социальные сети объединили премиальную эстетику Jaguar и Land Rover с более живой и понятной коммуникацией. В контенте появились реальные истории, локальные съёмки и сценарии, которые помогли бренду стать ближе аудитории, сохранив при этом свой характер и статус.</div>
+      </div>
+      <div class="divider-label">⑦ NEXT CASE</div>
+      <div class="section" style="text-align:center;padding:20px 24px">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:8px">Следующий кейс</div>
+        <button class="btn-secondary" onclick="goToPage('portfolio')">Allur →</button>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<script>
+function showPage(id, btn) {
+  document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function goToPage(id) {
+  document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  var page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  var tabMap = { home:'Главная', smm:'SMM', marketing:'Marketing', branding:'Branding', production:'Production', portfolio:'Кейсы', about:'О нас', blog:'Блог', case:'Кейс (пример)' };
+  document.querySelectorAll('.tab-btn').forEach(function(btn) { if (btn.textContent.trim() === tabMap[id]) btn.classList.add('active'); });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
